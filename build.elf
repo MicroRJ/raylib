@@ -1,0 +1,153 @@
+raylib := {
+	sources = {
+		{ name = "rcore",     path = "src/rcore.c" },
+		{ name = "rmodels",   path = "src/rmodels.c" },
+		{ name = "rshapes",   path = "src/rshapes.c" },
+		{ name = "rtext",     path = "src/rtext.c" },
+		{ name = "rtextures", path = "src/rtextures.c" },
+		{ name = "utils",     path = "src/utils.c" },
+		{ name = "raudio",    path = "src/raudio.c" },
+		{ name = "rglfw",     path = "src/rglfw.c" },
+	},
+
+	includes = {
+		"src",
+		"src/external/glfw/include",
+	},
+
+	defines = {
+		"PLATFORM_DESKTOP",
+		"GRAPHICS_API_OPENGL_33",
+		"_CRT_SECURE_NO_DEPRECATE",
+		"_CRT_NONSTDC_NO_DEPRECATE",
+		"WIN32",
+		"NDEBUG",
+	},
+
+	windows_libraries = {
+		"opengl32.lib",
+		"gdi32.lib",
+		"winmm.lib",
+		"shell32.lib",
+		"user32.lib",
+	},
+
+	example_directories = {
+		"audio",
+		"core",
+		"models",
+		"others",
+		"shaders",
+		"shapes",
+		"text",
+		"textures",
+	},
+
+	examples = {},
+	windows_excluded_examples = {
+		core_loading_thread = true,
+	},
+}
+
+for directory := raylib.example_directories[...] ? {
+	paths := elf.fs.get_paths(f"examples/${directory}")
+	elf.assert(paths != nil, f"could not list example directory '${directory}'")
+	for path := paths[...] ? {
+		name := elf.path.stem(path)
+		excluded := raylib.windows_excluded_examples:has(name)
+		if path:ends_with(".c") && excluded == 0 ? {
+			raylib.examples:add({ name = name, source = path })
+		}
+	}
+}
+
+quote ::= fun(value) ret f"\"${value}\""
+
+append_quoted ::= fun(command, values) {
+	for value := values[...] ? { command += f" ${quote(value)}" }
+	ret command
+}
+
+compile_command ::= fun(source, object, includes, defines) {
+	command := "clang-cl /nologo /std:c11 /W3 /O2"
+	for define := defines[...] ? { command += f" /D${define}" }
+	for include := includes[...] ? { command += f" /I${quote(include)}" }
+	ret f"${command} /c ${quote(source)} /Fo${quote(object)}"
+}
+
+elf.assert(elf.fs.create_directories("build/obj/raylib"), "could not create raylib object directory")
+elf.assert(elf.fs.create_directories("build/obj/examples"), "could not create example object directory")
+elf.assert(elf.fs.create_directories("build/examples"), "could not create example output directory")
+
+compile_tasks := {}
+objects := {}
+
+for source := raylib.sources[...] ? {
+	object := f"build/obj/raylib/${source.name}.obj"
+	task := {
+		name = f"compile raylib: ${source.name}",
+		command_line = compile_command(source.path, object, raylib.includes, raylib.defines),
+		inputs = { source.path },
+		outputs = { object },
+		include_dirs = raylib.includes,
+		dependencies = {},
+	}
+	compile_tasks:add(task)
+	objects:add(object)
+}
+
+archive_command := append_quoted("lib /nologo /OUT:\"build/raylib.lib\"", objects)
+library := {
+	name = "archive raylib",
+	command_line = archive_command,
+	inputs = objects,
+	outputs = { "build/raylib.lib" },
+	include_dirs = {},
+	dependencies = compile_tasks,
+}
+
+example_targets := {}
+for example := raylib.examples[...] ? {
+	object := f"build/obj/examples/${example.name}.obj"
+	example_includes := {
+		"src",
+		"src/external/glfw/include",
+		"examples/others/external/include",
+	}
+	compile := {
+		name = f"compile example: ${example.name}",
+		command_line = compile_command(example.source, object, example_includes, {}),
+		inputs = { example.source },
+		outputs = { object },
+		include_dirs = example_includes,
+		dependencies = {},
+	}
+
+	executable := f"build/examples/${example.name}.exe"
+	link_inputs := { object, "build/raylib.lib" }
+	link_arguments := link_inputs:clone():extend(raylib.windows_libraries)
+	link_command := append_quoted("clang-cl /nologo", link_arguments)
+	link_command += f" /Fe${quote(executable)}"
+	link := {
+		name = f"link example: ${example.name}",
+		command_line = link_command,
+		inputs = link_inputs,
+		outputs = { executable },
+		include_dirs = {},
+		dependencies = { compile, library },
+	}
+	example_targets:add(link)
+}
+
+entries := {}
+entries.library = fun() ret manny.build({
+	targets = { library },
+	options = { workers = 8 },
+})
+
+entries.build = fun() ret manny.build({
+	targets = example_targets,
+	options = { workers = 8 },
+})
+
+ret entries

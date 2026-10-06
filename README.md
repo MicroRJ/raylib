@@ -1,3 +1,7 @@
+> **Manny case study:** This branch builds Raylib's Windows x64 static-library
+> slice and 121 compatible examples with a 153-line [`build.elf`](build.elf).
+> See [MANNY.md](MANNY.md) for the exact scope and reproduction steps.
+
 <img align="left" src="https://github.com/raysan5/raylib/blob/master/logo/raylib_logo_animation.gif" width="288px">
 
 **raylib is a simple and easy-to-use library to enjoy videogames programming.**
