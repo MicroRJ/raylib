@@ -52,9 +52,9 @@ The case study was reproduced from a clean clone on Windows with Manny
 | `raylib.h` changed | 126 dependent compilations, the archive, and 121 links rebuilt |
 | Compiler command changed | All 251 tasks rebuilt |
 
-The clean build took 23.7 seconds on the test machine. These timings describe
-one machine and are not presented as a benchmark against Raylib's existing
-build systems.
+Two clean verification builds took 17.0 and 23.7 seconds on the test machine.
+These timings describe one machine and are not presented as a benchmark against
+Raylib's existing build systems.
 
 ## What this demonstrates
 
