@@ -1,16 +1,23 @@
 /*******************************************************************************************
 *
-*   raylib [shapes] example - raylib logo animation
+*   raylib [shapes] example - logo raylib anim
 *
-*   This example has been created using raylib 2.3 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*   Example complexity rating: [★★☆☆] 2/4
 *
-*   Copyright (c) 2014 Ramon Santamaria (@raysan5)
+*   Example originally created with raylib 2.5, last time updated with raylib 4.0
+*
+*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software
+*
+*   Copyright (c) 2014-2025 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
 #include "raylib.h"
 
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
@@ -18,7 +25,7 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [shapes] example - raylib logo animation");
+    InitWindow(screenWidth, screenHeight, "raylib [shapes] example - logo raylib anim");
 
     int logoPositionX = screenWidth/2 - 128;
     int logoPositionY = screenHeight/2 - 128;

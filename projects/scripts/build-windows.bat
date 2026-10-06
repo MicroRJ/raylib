@@ -26,13 +26,13 @@ REM Checks if cl is available and skips to the argument loop if it is
 REM (Prevents calling vcvarsall every time you run this script)
 WHERE cl >nul 2>nul
 IF %ERRORLEVEL% == 0 goto READ_ARGS
+
 REM Activate the msvc build environment if cl isn't available yet
-IF EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" (
-  set VC_INIT="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat"
-) ELSE IF EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" (
-  set VC_INIT="C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat"
-) ELSE IF EXIST "C:\Program Files (x86)\Microsoft Visual C++ Build Tools\vcbuildtools.bat" (
-  set VC_INIT="C:\Program Files (x86)\Microsoft Visual C++ Build Tools\vcbuildtools.bat"
+for /f "tokens=*" %%i in (
+  '"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath 2^>nul'
+) do set VS_PATH=%%i
+IF defined VS_PATH (
+  set VC_INIT="%VS_PATH%\VC\Auxiliary\Build\vcvarsall.bat"
 ) ELSE (
   REM Initialize your vc environment here if the defaults don't work
   REM  set VC_INIT="C:\your\path\here\vcvarsall.bat"
@@ -165,9 +165,9 @@ REM Build raylib if it hasn't been cached in TEMP_DIR
 IF NOT EXIST !TEMP_DIR!\ (
   mkdir !TEMP_DIR!
   cd !TEMP_DIR!
-  REM Raylib's src folder
+  REM raylib source folder
   set "RAYLIB_DEFINES=/D_DEFAULT_SOURCE /DPLATFORM_DESKTOP /DGRAPHICS_API_OPENGL_33"
-  set RAYLIB_C_FILES="!RAYLIB_SRC!\rcore.c" "!RAYLIB_SRC!\rshapes.c" "!RAYLIB_SRC!\rtextures.c" "!RAYLIB_SRC!\rtext.c" "!RAYLIB_SRC!\rmodels.c" "!RAYLIB_SRC!\utils.c" "!RAYLIB_SRC!\raudio.c" "!RAYLIB_SRC!\rglfw.c"
+  set RAYLIB_C_FILES="!RAYLIB_SRC!\rcore.c" "!RAYLIB_SRC!\rshapes.c" "!RAYLIB_SRC!\rtextures.c" "!RAYLIB_SRC!\rtext.c" "!RAYLIB_SRC!\rmodels.c" "!RAYLIB_SRC!\raudio.c" "!RAYLIB_SRC!\rglfw.c"
   set RAYLIB_INCLUDE_FLAGS=/I"!RAYLIB_SRC!" /I"!RAYLIB_SRC!\external\glfw\include"
 
   IF DEFINED REALLY_QUIET (
@@ -175,7 +175,7 @@ IF NOT EXIST !TEMP_DIR!\ (
   ) ELSE (
     cl.exe /w /c !VERBOSITY_FLAG! !RAYLIB_DEFINES! !RAYLIB_INCLUDE_FLAGS! !COMPILATION_FLAGS! !RAYLIB_C_FILES! || exit /B
   )
-  IF NOT DEFINED QUIET echo COMPILE-INFO: Raylib compiled into object files in: !TEMP_DIR!\
+  IF NOT DEFINED QUIET echo COMPILE-INFO: raylib compiled into object files in: !TEMP_DIR!\
 
   REM Out of the temp directory
   cd !ROOT_DIR!

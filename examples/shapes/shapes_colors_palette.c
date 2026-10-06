@@ -1,11 +1,15 @@
 /*******************************************************************************************
 *
-*   raylib [shapes] example - Colors palette
+*   raylib [shapes] example - colors palette
 *
-*   This example has been created using raylib 2.5 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*   Example complexity rating: [★★☆☆] 2/4
 *
-*   Copyright (c) 2014-2019 Ramon Santamaria (@raysan5)
+*   Example originally created with raylib 1.0, last time updated with raylib 2.5
+*
+*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software
+*
+*   Copyright (c) 2014-2025 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -13,6 +17,9 @@
 
 #define MAX_COLORS_COUNT    21          // Number of colors available
 
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
@@ -38,7 +45,7 @@ int main(void)
     for (int i = 0; i < MAX_COLORS_COUNT; i++)
     {
         colorsRecs[i].x = 20.0f + 100.0f *(i%7) + 10.0f *(i%7);
-        colorsRecs[i].y = 80.0f + 100.0f *(i/7) + 10.0f *(i/7);
+        colorsRecs[i].y = 80.0f + 100.0f *((int)i/7) + 10.0f *((float)i/7);
         colorsRecs[i].width = 100.0f;
         colorsRecs[i].height = 100.0f;
     }

@@ -1,59 +1,23 @@
 /*******************************************************************************************
 *
-*   raylib [audio] example - Music playing (streaming)
+*   raylib [audio] example - music stream
 *
-*   This example has been created using raylib 1.3 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*   Example complexity rating: [★☆☆☆] 1/4
 *
-*   Copyright (c) 2015 Ramon Santamaria (@raysan5)
+*   Example originally created with raylib 1.3, last time updated with raylib 4.2
+*
+*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software
+*
+*   Copyright (c) 2015-2025 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
 #include "raylib.h"
 
-#include <stdlib.h>         // Required for: NULL
-
-// Audio effect: lowpass filter
-static void AudioProcessEffectLPF(void *buffer, unsigned int frames)
-{
-    static float low[2] = { 0.0f, 0.0f };
-    static const float cutoff = 70.0f / 44100.0f; // 70 Hz lowpass filter
-    const float k = cutoff / (cutoff + 0.1591549431f); // RC filter formula
-
-    for (unsigned int i = 0; i < frames*2; i += 2)
-    {
-        float l = ((float *)buffer)[i], r = ((float *)buffer)[i + 1];
-        low[0] += k * (l - low[0]);
-        low[1] += k * (r - low[1]);
-        ((float *)buffer)[i] = low[0];
-        ((float *)buffer)[i + 1] = low[1];
-    }
-}
-
-static float *delayBuffer = NULL;
-static unsigned int delayBufferSize = 0;
-static unsigned int delayReadIndex = 2;
-static unsigned int delayWriteIndex = 0;
-
-// Audio effect: delay
-static void AudioProcessEffectDelay(void *buffer, unsigned int frames)
-{
-    for (unsigned int i = 0; i < frames*2; i += 2)
-    {
-        float leftDelay = delayBuffer[delayReadIndex++];    // ERROR: Reading buffer -> WHY??? Maybe thread related???
-        float rightDelay = delayBuffer[delayReadIndex++];
-
-        if (delayReadIndex == delayBufferSize) delayReadIndex = 0;
-
-        ((float *)buffer)[i] = 0.5f*((float *)buffer)[i] + 0.5f*leftDelay;
-        ((float *)buffer)[i + 1] = 0.5f*((float *)buffer)[i + 1] + 0.5f*rightDelay;
-
-        delayBuffer[delayWriteIndex++] = ((float *)buffer)[i];
-        delayBuffer[delayWriteIndex++] = ((float *)buffer)[i + 1];
-        if (delayWriteIndex == delayBufferSize) delayWriteIndex = 0;
-    }
-}
-
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
@@ -61,24 +25,24 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [audio] example - music playing (streaming)");
+    InitWindow(screenWidth, screenHeight, "raylib [audio] example - music stream");
 
     InitAudioDevice();              // Initialize audio device
 
     Music music = LoadMusicStream("resources/country.mp3");
 
-    // Allocate buffer for the delay effect
-    delayBuffer = (float *)RL_CALLOC(48000*2, sizeof(float));   // 1 second delay (device sampleRate*channels)
-
     PlayMusicStream(music);
 
-    float timePlayed = 0.0f;
-    bool pause = false;
+    float timePlayed = 0.0f;        // Time played normalized [0.0f..1.0f]
+    bool pause = false;             // Music playing paused
 
-    bool hasFilter = false;
-    bool hasDelay = false;
+    float pan = 0.0f;               // Default audio pan center [-1.0f..1.0f]
+    SetMusicPan(music, pan);
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+    float volume = 0.8f;            // Default audio volume [0.0f..1.0f]
+    SetMusicVolume(music, volume);
+
+    SetTargetFPS(30);               // Set our game to run at 30 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -104,26 +68,38 @@ int main(void)
             else ResumeMusicStream(music);
         }
 
-        // Add/Remove effect: lowpass filter
-        if (IsKeyPressed(KEY_F))
+        // Set audio pan
+        if (IsKeyDown(KEY_LEFT))
         {
-            hasFilter = !hasFilter;
-            if (hasFilter) AttachAudioStreamProcessor(music.stream, AudioProcessEffectLPF);
-            else DetachAudioStreamProcessor(music.stream, AudioProcessEffectLPF);
+            pan -= 0.05f;
+            if (pan < -1.0f) pan = -1.0f;
+            SetMusicPan(music, pan);
+        }
+        else if (IsKeyDown(KEY_RIGHT))
+        {
+            pan += 0.05f;
+            if (pan > 1.0f) pan = 1.0f;
+            SetMusicPan(music, pan);
         }
 
-        // Add/Remove effect: delay
-        if (IsKeyPressed(KEY_D))
+        // Set audio volume
+        if (IsKeyDown(KEY_DOWN))
         {
-            hasDelay = !hasDelay;
-            if (hasDelay) AttachAudioStreamProcessor(music.stream, AudioProcessEffectDelay);
-            else DetachAudioStreamProcessor(music.stream, AudioProcessEffectDelay);
+            volume -= 0.05f;
+            if (volume < 0.0f) volume = 0.0f;
+            SetMusicVolume(music, volume);
+        }
+        else if (IsKeyDown(KEY_UP))
+        {
+            volume += 0.05f;
+            if (volume > 1.0f) volume = 1.0f;
+            SetMusicVolume(music, volume);
         }
 
-        // Get timePlayed scaled to bar dimensions (400 pixels)
-        timePlayed = GetMusicTimePlayed(music)/GetMusicTimeLength(music)*400;
+        // Get normalized time played for current music stream
+        timePlayed = GetMusicTimePlayed(music)/GetMusicTimeLength(music);
 
-        if (timePlayed > 400) StopMusicStream(music);
+        if (timePlayed > 1.0f) timePlayed = 1.0f;   // Make sure time played is no longer than music
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -134,12 +110,22 @@ int main(void)
 
             DrawText("MUSIC SHOULD BE PLAYING!", 255, 150, 20, LIGHTGRAY);
 
+            DrawText("LEFT-RIGHT for PAN CONTROL", 320, 74, 10, DARKBLUE);
+            DrawRectangle(300, 100, 200, 12, LIGHTGRAY);
+            DrawRectangleLines(300, 100, 200, 12, GRAY);
+            DrawRectangle((int)(300 + (pan + 1.0f)/2.0f*200 - 5), 92, 10, 28, DARKGRAY);
+
             DrawRectangle(200, 200, 400, 12, LIGHTGRAY);
-            DrawRectangle(200, 200, (int)timePlayed, 12, MAROON);
+            DrawRectangle(200, 200, (int)(timePlayed*400.0f), 12, MAROON);
             DrawRectangleLines(200, 200, 400, 12, GRAY);
 
             DrawText("PRESS SPACE TO RESTART MUSIC", 215, 250, 20, LIGHTGRAY);
             DrawText("PRESS P TO PAUSE/RESUME MUSIC", 208, 280, 20, LIGHTGRAY);
+
+            DrawText("UP-DOWN for VOLUME CONTROL", 320, 334, 10, DARKGREEN);
+            DrawRectangle(300, 360, 200, 12, LIGHTGRAY);
+            DrawRectangleLines(300, 360, 200, 12, GRAY);
+            DrawRectangle((int)(300 + volume*200 - 5), 352, 10, 28, DARKGRAY);
 
         EndDrawing();
         //----------------------------------------------------------------------------------
@@ -150,8 +136,6 @@ int main(void)
     UnloadMusicStream(music);   // Unload music stream buffers from RAM
 
     CloseAudioDevice();         // Close audio device (music streaming is automatically stopped)
-
-    RL_FREE(delayBuffer);       // Free delay buffer
 
     CloseWindow();              // Close window and OpenGL context
     //--------------------------------------------------------------------------------------

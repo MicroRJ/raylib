@@ -2,11 +2,11 @@
 > slice and 121 compatible examples with a 153-line [`build.elf`](build.elf).
 > See [MANNY.md](MANNY.md) for the exact scope and reproduction steps.
 
-<img align="left" src="https://github.com/raysan5/raylib/blob/master/logo/raylib_logo_animation.gif" width="288px">
+<img align="left" style="width:260px" src="https://github.com/raysan5/raylib/blob/master/logo/raylib_logo_animation.gif" width="288px">
 
 **raylib is a simple and easy-to-use library to enjoy videogames programming.**
 
-raylib is highly inspired by Borland BGI graphics lib and by XNA framework and it's specially well suited for prototyping, tooling, graphical applications, embedded systems and education.
+raylib is highly inspired by Borland BGI graphics lib and by XNA framework and it's especially well suited for prototyping, tooling, graphical applications, embedded systems and education.
 
 *NOTE for ADVENTURERS: raylib is a programming library to enjoy videogames programming; no fancy interface, no visual helpers, no debug button... just coding in the most pure spartan-programmers way.*
 
@@ -16,59 +16,67 @@ Ready to learn? Jump to [code examples!](https://www.raylib.com/examples.html)
 
 <br>
 
-[![GitHub Contributors](https://img.shields.io/github/contributors/raysan5/raylib)](https://github.com/raysan5/raylib/graphs/contributors)
 [![GitHub Releases Downloads](https://img.shields.io/github/downloads/raysan5/raylib/total)](https://github.com/raysan5/raylib/releases)
 [![GitHub Stars](https://img.shields.io/github/stars/raysan5/raylib?style=flat&label=stars)](https://github.com/raysan5/raylib/stargazers)
-[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/raysan5/raylib/4.0.0)](https://github.com/raysan5/raylib/commits/master)
-[![Packaging Status](https://repology.org/badge/tiny-repos/raylib.svg)](https://repology.org/project/raylib/versions)
+[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/raysan5/raylib/6.0)](https://github.com/raysan5/raylib/commits/master)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/raysan5?label=sponsors)](https://github.com/sponsors/raysan5)
 [![License](https://img.shields.io/badge/license-zlib%2Flibpng-blue.svg)](LICENSE)
 
 [![Discord Members](https://img.shields.io/discord/426912293134270465.svg?label=Discord&logo=discord)](https://discord.gg/raylib)
-[![Subreddit Subscribers](https://img.shields.io/reddit/subreddit-subscribers/raylib?label=reddit%20r%2Fraylib&logo=reddit)](https://www.reddit.com/r/raylib/)
-[![Youtube Subscribers](https://img.shields.io/youtube/channel/subscribers/UC8WIBkhYb5sBNqXO1mZ7WSQ?style=flat&label=Youtube&logo=youtube)](https://www.youtube.com/c/raylib)
+[![Reddit Static Badge](https://img.shields.io/badge/-r%2Fraylib-red?style=flat&logo=reddit&label=reddit)](https://www.reddit.com/r/raylib/)
+[![Youtube Static Badge](https://img.shields.io/badge/YouTube-raylib-red?style=flat&logo=youtube&logoColor=red)](https://www.youtube.com/c/raylib)
 [![Twitch Status](https://img.shields.io/twitch/status/raysan5?style=flat&label=Twitch&logo=twitch)](https://www.twitch.tv/raysan5)
-[![Twitter Followers](https://img.shields.io/twitter/follow/raysan5?style=flat&label=@raysan5&color=1da1f2&logo=twitter)](https://twitter.com/raysan5)
 
+[![Build Windows](https://github.com/raysan5/raylib/actions/workflows/build_windows.yml/badge.svg)](https://github.com/raysan5/raylib/actions/workflows/build_windows.yml)
+[![Build Linux](https://github.com/raysan5/raylib/actions/workflows/build_linux.yml/badge.svg)](https://github.com/raysan5/raylib/actions/workflows/build_linux.yml)
+[![Build macOS](https://github.com/raysan5/raylib/actions/workflows/build_macos.yml/badge.svg)](https://github.com/raysan5/raylib/actions/workflows/build_macos.yml)
+[![Build WebAssembly](https://github.com/raysan5/raylib/actions/workflows/build_webassembly.yml/badge.svg)](https://github.com/raysan5/raylib/actions/workflows/build_webassembly.yml)
 
-[![Windows](https://github.com/raysan5/raylib/workflows/Windows/badge.svg)](https://github.com/raysan5/raylib/actions?query=workflow%3AWindows)
-[![Linux](https://github.com/raysan5/raylib/workflows/Linux/badge.svg)](https://github.com/raysan5/raylib/actions?query=workflow%3ALinux)
-[![macOS](https://github.com/raysan5/raylib/workflows/macOS/badge.svg)](https://github.com/raysan5/raylib/actions?query=workflow%3AmacOS)
-[![Android](https://github.com/raysan5/raylib/workflows/Android/badge.svg)](https://github.com/raysan5/raylib/actions?query=workflow%3AAndroid)
-[![WebAssembly](https://github.com/raysan5/raylib/workflows/WebAssembly/badge.svg)](https://github.com/raysan5/raylib/actions?query=workflow%3AWebAssembly)
-
-[![CMakeBuilds](https://github.com/raysan5/raylib/workflows/CMakeBuilds/badge.svg)](https://github.com/raysan5/raylib/actions?query=workflow%3ACMakeBuilds)
-[![Windows Examples](https://github.com/raysan5/raylib/actions/workflows/windows_examples.yml/badge.svg)](https://github.com/raysan5/raylib/actions/workflows/windows_examples.yml)
-[![Linux Examples](https://github.com/raysan5/raylib/actions/workflows/linux_examples.yml/badge.svg)](https://github.com/raysan5/raylib/actions/workflows/linux_examples.yml)
+[![Build CMake](https://github.com/raysan5/raylib/actions/workflows/build_cmake.yml/badge.svg)](https://github.com/raysan5/raylib/actions/workflows/build_cmake.yml)
+[![Build examples Windows](https://github.com/raysan5/raylib/actions/workflows/build_examples_windows.yml/badge.svg)](https://github.com/raysan5/raylib/actions/workflows/build_examples_windows.yml)
+[![Build examples Linux](https://github.com/raysan5/raylib/actions/workflows/build_examples_linux.yml/badge.svg)](https://github.com/raysan5/raylib/actions/workflows/build_examples_linux.yml)
 
 features
 --------
-  - **NO external dependencies**, all required libraries are [bundled into raylib](https://github.com/raysan5/raylib/tree/master/src/external)
+  - **NO external dependencies**, all required libraries are [included in raylib](https://github.com/raysan5/raylib/tree/master/src/external)
   - Multiple platforms supported: **Windows, Linux, MacOS, RPI, Android, HTML5... and more!**
-  - Written in plain C code (C99) in PascalCase/camelCase notation
-  - Hardware accelerated with OpenGL (**1.1, 2.1, 3.3, 4.3 or ES 2.0**)
+  - Written in plain C code (C99) using PascalCase/camelCase notation
+  - Hardware accelerated with OpenGL: **1.1, 2.1, 3.3, 4.3, ES 2.0, ES 3.0**
   - **Unique OpenGL abstraction layer** (usable as standalone module): [rlgl](https://github.com/raysan5/raylib/blob/master/src/rlgl.h)
-  - Multiple **Fonts** formats supported (TTF, XNA fonts, AngelCode fonts)
+  - **Software Renderer** backend (no OpenGL required!): [rlsw](https://github.com/raysan5/raylib/blob/master/src/external/rlsw.h)
+  - Multiple **Fonts** formats supported (TTF, OTF, FNT, BDF, sprite fonts)
   - Multiple texture formats supported, including **compressed formats** (DXT, ETC, ASTC)
-  - **Full 3D support**, including 3D Shapes, Models, Billboards, Heightmaps and more! 
+  - **Full 3D support**, including 3D Shapes, Models, Billboards, Heightmaps and more!
   - Flexible Materials system, supporting classic maps and **PBR maps**
-  - **Animated 3D models** supported (skeletal bones animation) (IQM)
-  - Shaders support, including model and **postprocessing** shaders.
+  - **Animated 3D models** supported (skeletal bones animation) (IQM, M3D, glTF)
+  - Shaders support, including model shaders and **postprocessing** shaders
   - **Powerful math module** for Vector, Matrix and Quaternion operations: [raymath](https://github.com/raysan5/raylib/blob/master/src/raymath.h)
-  - Audio loading and playing with streaming support (WAV, OGG, MP3, FLAC, XM, MOD)
+  - Audio loading and playing with streaming support (WAV, QOA, OGG, MP3, FLAC, XM, MOD)
   - **VR stereo rendering** support with configurable HMD device parameters
-  - Huge examples collection with [+120 code examples](https://github.com/raysan5/raylib/tree/master/examples)!
-  - Bindings to [+50 programming languages](https://github.com/raysan5/raylib/blob/master/BINDINGS.md)!
-  - **Free and open source**.
+  - Huge examples collection with [+200 code examples](https://github.com/raysan5/raylib/tree/master/examples)!
+  - Bindings to [+70 programming languages](https://github.com/raysan5/raylib/blob/master/BINDINGS.md)!
+  - **Free and open source**
+
+limitations
+-----------
+
+raylib presents some limitations by design for code simplicity. Some forks, alternatives, and samples are available to overcome most of them but it's up to the users to modify the library for their specific needs.
+
+  - Single window with single OpenGL context by default, no multi-window support
+  - Window resize and move stops the rendering loop on platforms supporting a window
+  - `RenderTextures` are flipped vertically, as provided by OpenGL, it's up to the user to draw them flipped to the screen
+  - Font rasterization has lower quality than alternatives using `Freetype2`, `HarfBuzz` or `Slug`
+  - Text drawing does not support RTL, ligatures or emojis
 
 basic example
 --------------
-This is a basic raylib example, it creates a window and it draws the text `"Congrats! You created your first window!"` in the middle of the screen. Check this example [running live on web here](https://www.raylib.com/examples/core/loader.html?name=core_basic_window).
+This is a basic raylib example, it creates a window and draws the text `"Congrats! You created your first window!"` in the middle of the screen. Check this example [running live on web here](https://www.raylib.com/examples/core/loader.html?name=core_basic_window).
 ```c
 #include "raylib.h"
 
 int main(void)
 {
-    InitWindow(800, 450, "raylib [core] example - basic window");
+    InitWindow(800, 450, "raylib example - basic window");
 
     while (!WindowShouldClose())
     {
@@ -89,7 +97,7 @@ build and installation
 
 raylib binary releases for Windows, Linux, macOS, Android and HTML5 are available at the [Github Releases page](https://github.com/raysan5/raylib/releases).
 
-raylib is also available via multiple [package managers](https://github.com/raysan5/raylib/issues/613) on multiple OS distributions.
+raylib is also available via multiple package managers on multiple OS distributions.
 
 #### Installing and building raylib on multiple platforms
 
@@ -105,7 +113,7 @@ raylib is also available via multiple [package managers](https://github.com/rays
  - [Working for Web (HTML5)](https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5))
  - [Working anywhere with CMake](https://github.com/raysan5/raylib/wiki/Working-with-CMake)
 
-*Note that Wiki is open for edit, if you find some issue while building raylib for your target platform, feel free to edit the Wiki or open and issue related to it.*
+*Note that the Wiki is open to edits, if you find some issues while building raylib for your target platform, feel free to edit the Wiki or open an issue related to it.*
 
 #### Setup raylib with multiple IDEs
 
@@ -113,14 +121,14 @@ raylib has been developed on Windows platform using [Notepad++](https://notepad-
 
 [Projects directory](https://github.com/raysan5/raylib/tree/master/projects) contains several ready-to-use **project templates** to build raylib and code examples with multiple IDEs.
 
-*Note that there are lots of IDEs supported, some of the provided templates could require some review, please, if you find some issue with some template or you think they could be improved, feel free to send a PR or open a related issue.*
+*Note that there are lots of IDEs supported, some of the provided templates could require some review, so please, if you find some issue with a template or you think they could be improved, feel free to send a PR or open a related issue.*
 
 learning and docs
 ------------------
 
-raylib is designed to be learned using [the examples](https://github.com/raysan5/raylib/tree/master/examples) as the main reference. There is no standard API documentation but there is a [**cheatsheet**](https://www.raylib.com/cheatsheet/cheatsheet.html) containing all the functions available on the library and a short description of each one of them, input parameters and result value names should be intuitive enough to understand how each function works. 
+raylib is designed to be learned using [the examples](https://github.com/raysan5/raylib/tree/master/examples) as the main reference. There is no standard API documentation but there is a [**cheatsheet**](https://www.raylib.com/cheatsheet/cheatsheet.html) containing all the functions available in the library with a short description of each one; input parameters and result value names should be intuitive enough to understand how each function works.
 
-Some additional documentation about raylib design can be found in raylib GitHub Wiki. Here the more relevant links:
+Some additional documentation about raylib design can be found in [raylib GitHub Wiki](https://github.com/raysan5/raylib/wiki). Here are the relevant links:
 
  - [raylib cheatsheet](https://www.raylib.com/cheatsheet/cheatsheet.html)
  - [raylib architecture](https://github.com/raysan5/raylib/wiki/raylib-architecture)
@@ -136,15 +144,23 @@ raylib is present in several networks and raylib community is growing everyday. 
 
  - Webpage: [https://www.raylib.com](https://www.raylib.com)
  - Discord: [https://discord.gg/raylib](https://discord.gg/raylib)
- - Twitter: [https://www.twitter.com/raysan5](https://www.twitter.com/raysan5)
+ - X: [https://x.com/raysan5](https://x.com/raysan5)
+ - BlueSky: [https://bsky.app/profile/raysan5](https://bsky.app/profile/raysan5.bsky.social)
  - Twitch:  [https://www.twitch.tv/raysan5](https://www.twitch.tv/raysan5)
  - Reddit:  [https://www.reddit.com/r/raylib](https://www.reddit.com/r/raylib)
  - Patreon: [https://www.patreon.com/raylib](https://www.patreon.com/raylib)
  - YouTube: [https://www.youtube.com/channel/raylib](https://www.youtube.com/c/raylib)
+
+contributors
+------------
+
+<a href="https://github.com/raysan5/raylib/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=raysan5/raylib&max=800&columns=24&anon=0" />
+</a>
 
 license
 -------
 
 raylib is licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
 
-raylib uses internally some libraries for window/graphics/inputs management and also to support different fileformats loading, all those libraries are embedded with and are available in [src/external](https://github.com/raysan5/raylib/tree/master/src/external) directory. Check [raylib dependencies LICENSES](https://github.com/raysan5/raylib/wiki/raylib-dependencies) on raylib Wiki for details.
+raylib uses internally some libraries for window/graphics/inputs management and also to support different file formats loading, all those libraries are embedded with and are available in [src/external](https://github.com/raysan5/raylib/tree/master/src/external) directory. Check [raylib dependencies LICENSES](https://github.com/raysan5/raylib/wiki/raylib-dependencies) on [raylib Wiki](https://github.com/raysan5/raylib/wiki) for details.

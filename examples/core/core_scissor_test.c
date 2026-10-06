@@ -1,18 +1,25 @@
 /*******************************************************************************************
 *
-*   raylib [core] example - Scissor test
+*   raylib [core] example - scissor test
 *
-*   This example has been created using raylib 2.5 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*   Example complexity rating: [★☆☆☆] 1/4
+*
+*   Example originally created with raylib 2.5, last time updated with raylib 3.0
 *
 *   Example contributed by Chris Dill (@MysteriousSpace) and reviewed by Ramon Santamaria (@raysan5)
 *
-*   Copyright (c) 2019 Chris Dill (@MysteriousSpace)
+*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software
+*
+*   Copyright (c) 2019-2025 Chris Dill (@MysteriousSpace)
 *
 ********************************************************************************************/
 
 #include "raylib.h"
 
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization

@@ -1,12 +1,16 @@
 /*******************************************************************************************
 *
-*   raylib [rlgl] example - Using rlgl module as standalone module
+*   raylib [others] example - standalone
 *
 *   rlgl library is an abstraction layer for multiple OpenGL versions (1.1, 2.1, 3.3 Core, ES 2.0)
 *   that provides a pseudo-OpenGL 1.1 immediate-mode style API (rlVertex, rlTranslate, rlRotate...)
 *
-*   NOTE: This example requires OpenGL 3.3 or OpenGL ES 2.0 for shaders support,
-*         OpenGL 1.1 does not support shaders but it can also be used.
+*   Example complexity rating: [★★★★] 4/4
+*
+*   Example originally created with raylib 1.6, last time updated with raylib 4.0
+*
+*   WARNING: This example is intended only for PLATFORM_DESKTOP and OpenGL 3.3 Core profile
+*       It could work on other platforms if redesigned for those platforms (out-of-scope)
 *
 *   DEPENDENCIES:
 *       glfw3     - Windows and context initialization library
@@ -20,7 +24,7 @@
 *
 *   APPLE COMPILATION:
 *       gcc -o rlgl_standalone rlgl_standalone.c -I../../src -Iexternal/include -Lexternal/lib \
-*           -lglfw3 -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa
+*           -lglfw3 -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework QuartzCore
 *           -Wno-deprecated-declarations -std=c99 -DGRAPHICS_API_OPENGL_33
 *
 *
@@ -29,7 +33,7 @@
 *   This example is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software:
 *
-*   Copyright (c) 2014-2021 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2014-2025 Ramon Santamaria (@raysan5)
 *
 *   This software is provided "as-is", without any express or implied warranty. In no event
 *   will the authors be held liable for any damages arising from the use of this software.
@@ -44,7 +48,7 @@
 *     2. Altered source versions must be plainly marked as such, and must not be misrepresented
 *     as being the original software.
 *
-*     3. This notice may not be removed or altered from any source distribution.
+*     3. This notice may not be removed or altered from any source distribution
 *
 ********************************************************************************************/
 
@@ -64,9 +68,6 @@
 #define RAYMATH_STATIC_INLINE
 #include "raymath.h"            // Vector2, Vector3, Quaternion and Matrix functionality
 
-#if defined(__EMSCRIPTEN__)
-    #define GLFW_INCLUDE_ES2
-#endif
 #include "GLFW/glfw3.h"         // Windows/Context and inputs management
 
 #include <stdio.h>              // Required for: printf()
@@ -76,7 +77,7 @@
 #define DARKGRAY   (Color){ 80, 80, 80, 255 }      // Dark Gray
 
 //----------------------------------------------------------------------------------
-// Structures Definition
+// Types and Structures Definition
 //----------------------------------------------------------------------------------
 // Color, 4 components, R8G8B8A8 (32bit)
 typedef struct Color {
@@ -96,7 +97,7 @@ typedef struct Camera {
 } Camera;
 
 //----------------------------------------------------------------------------------
-// Module specific Functions Declaration
+// Module Functions Declaration
 //----------------------------------------------------------------------------------
 static void ErrorCallback(int error, const char *description);
 static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -113,9 +114,9 @@ static void DrawRectangleV(Vector2 position, Vector2 size, Color color);
 //static Matrix MatrixPerspective(double fovy, double aspect, double near, double far);
 //static Matrix MatrixLookAt(Vector3 eye, Vector3 target, Vector3 up);
 
-//----------------------------------------------------------------------------------
-// Main Entry point
-//----------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
@@ -136,6 +137,8 @@ int main(void)
 
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_DEPTH_BITS, 16);
+
+    // WARNING: OpenGL 3.3 Core profile only
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -144,7 +147,7 @@ int main(void)
     glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
 #endif
 
-    GLFWwindow *window = glfwCreateWindow(screenWidth, screenHeight, "rlgl standalone", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(screenWidth, screenHeight, "raylib [others] example - rlgl standalone", NULL, NULL);
 
     if (!window)
     {
@@ -257,7 +260,7 @@ int main(void)
 }
 
 //----------------------------------------------------------------------------------
-// Module specific Functions Definitions
+// Module Functions Definitions
 //----------------------------------------------------------------------------------
 
 // GLFW3: Error callback
@@ -294,7 +297,7 @@ static void DrawRectangleV(Vector2 position, Vector2 size, Color color)
 // Draw a grid centered at (0, 0, 0)
 static void DrawGrid(int slices, float spacing)
 {
-    int halfSlices = slices / 2;
+    int halfSlices = slices/2;
 
     rlBegin(RL_LINES);
         for (int i = -halfSlices; i <= halfSlices; i++)

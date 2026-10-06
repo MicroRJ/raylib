@@ -1,13 +1,17 @@
 /*******************************************************************************************
 *
-*   raylib [models] example - Plane rotations (yaw, pitch, roll)
+*   raylib [models] example - yaw pitch roll
 *
-*   This example has been created using raylib 1.8 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*   Example complexity rating: [★★☆☆] 2/4
+*
+*   Example originally created with raylib 1.8, last time updated with raylib 4.0
 *
 *   Example contributed by Berni (@Berni8k) and reviewed by Ramon Santamaria (@raysan5)
 *
-*   Copyright (c) 2017-2021 Berni (@Berni8k) and Ramon Santamaria (@raysan5)
+*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software
+*
+*   Copyright (c) 2017-2025 Berni (@Berni8k) and Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -15,6 +19,9 @@
 
 #include "raymath.h"        // Required for: MatrixRotateXYZ()
 
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
@@ -23,7 +30,7 @@ int main(void)
     const int screenHeight = 450;
 
     //SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI);
-    InitWindow(screenWidth, screenHeight, "raylib [models] example - plane rotations (yaw, pitch, roll)");
+    InitWindow(screenWidth, screenHeight, "raylib [models] example - yaw pitch roll");
 
     Camera camera = { 0 };
     camera.position = (Vector3){ 0.0f, 50.0f, -120.0f };// Camera position perspective
@@ -34,6 +41,9 @@ int main(void)
 
     Model model = LoadModel("resources/models/obj/plane.obj");                  // Load model
     Texture2D texture = LoadTexture("resources/models/obj/plane_diffuse.png");  // Load model texture
+
+    SetTextureWrap(texture, TEXTURE_WRAP_REPEAT);       // Force Repeat to avoid issue on Web version
+
     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;            // Set map diffuse texture
 
     float pitch = 0.0f;
@@ -58,8 +68,8 @@ int main(void)
         }
 
         // Plane yaw (y-axis) controls
-        if (IsKeyDown(KEY_S)) yaw += 1.0f;
-        else if (IsKeyDown(KEY_A)) yaw -= 1.0f;
+        if (IsKeyDown(KEY_S)) yaw -= 1.0f;
+        else if (IsKeyDown(KEY_A)) yaw += 1.0f;
         else
         {
             if (yaw > 0.0f) yaw -= 0.5f;
@@ -67,8 +77,8 @@ int main(void)
         }
 
         // Plane roll (z-axis) controls
-        if (IsKeyDown(KEY_LEFT)) roll += 1.0f;
-        else if (IsKeyDown(KEY_RIGHT)) roll -= 1.0f;
+        if (IsKeyDown(KEY_LEFT)) roll -= 1.0f;
+        else if (IsKeyDown(KEY_RIGHT)) roll += 1.0f;
         else
         {
             if (roll > 0.0f) roll -= 0.5f;
@@ -109,6 +119,7 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     UnloadModel(model);     // Unload model data
+    UnloadTexture(texture); // Unload texture data
 
     CloseWindow();          // Close window and OpenGL context
     //--------------------------------------------------------------------------------------

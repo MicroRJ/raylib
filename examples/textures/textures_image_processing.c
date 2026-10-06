@@ -1,13 +1,17 @@
 /*******************************************************************************************
 *
-*   raylib [textures] example - Image processing
+*   raylib [textures] example - image processing
+*
+*   Example complexity rating: [★★★☆] 3/4
 *
 *   NOTE: Images are loaded in CPU memory (RAM); textures are loaded in GPU memory (VRAM)
 *
-*   This example has been created using raylib 3.5 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*   Example originally created with raylib 1.4, last time updated with raylib 3.5
 *
-*   Copyright (c) 2016 Ramon Santamaria (@raysan5)
+*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software
+*
+*   Copyright (c) 2016-2025 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -15,7 +19,7 @@
 
 #include <stdlib.h>             // Required for: free()
 
-#define NUM_PROCESSES    8
+#define NUM_PROCESSES    9
 
 typedef enum {
     NONE = 0,
@@ -24,6 +28,7 @@ typedef enum {
     COLOR_INVERT,
     COLOR_CONTRAST,
     COLOR_BRIGHTNESS,
+    GAUSSIAN_BLUR,
     FLIP_VERTICAL,
     FLIP_HORIZONTAL
 } ImageProcess;
@@ -35,10 +40,14 @@ static const char *processText[] = {
     "COLOR INVERT",
     "COLOR CONTRAST",
     "COLOR BRIGHTNESS",
+    "GAUSSIAN BLUR",
     "FLIP VERTICAL",
     "FLIP HORIZONTAL"
 };
 
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
@@ -100,7 +109,7 @@ int main(void)
         else if (IsKeyPressed(KEY_UP))
         {
             currentProcess--;
-            if (currentProcess < 0) currentProcess = 7;
+            if (currentProcess < 0) currentProcess = (NUM_PROCESSES - 1);
             textureReload = true;
         }
 
@@ -120,6 +129,7 @@ int main(void)
                 case COLOR_INVERT: ImageColorInvert(&imCopy); break;
                 case COLOR_CONTRAST: ImageColorContrast(&imCopy, -40); break;
                 case COLOR_BRIGHTNESS: ImageColorBrightness(&imCopy, -80); break;
+                case GAUSSIAN_BLUR: ImageBlurGaussian(&imCopy, 10); break;
                 case FLIP_VERTICAL: ImageFlipVertical(&imCopy); break;
                 case FLIP_HORIZONTAL: ImageFlipHorizontal(&imCopy); break;
                 default: break;
@@ -146,7 +156,7 @@ int main(void)
             {
                 DrawRectangleRec(toggleRecs[i], ((i == currentProcess) || (i == mouseHoverRec)) ? SKYBLUE : LIGHTGRAY);
                 DrawRectangleLines((int)toggleRecs[i].x, (int) toggleRecs[i].y, (int) toggleRecs[i].width, (int) toggleRecs[i].height, ((i == currentProcess) || (i == mouseHoverRec)) ? BLUE : GRAY);
-                DrawText( processText[i], (int)( toggleRecs[i].x + toggleRecs[i].width/2 - MeasureText(processText[i], 10)/2), (int) toggleRecs[i].y + 11, 10, ((i == currentProcess) || (i == mouseHoverRec)) ? DARKBLUE : DARKGRAY);
+                DrawText( processText[i], (int)( toggleRecs[i].x + toggleRecs[i].width/2 - (float)MeasureText(processText[i], 10)/2), (int) toggleRecs[i].y + 11, 10, ((i == currentProcess) || (i == mouseHoverRec)) ? DARKBLUE : DARKGRAY);
             }
 
             DrawTexture(texture, screenWidth - texture.width - 60, screenHeight/2 - texture.height/2, WHITE);

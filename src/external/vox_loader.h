@@ -67,7 +67,7 @@ revision history:
 #define VOX_SUCCESS (0)
 #define VOX_ERROR_FILE_NOT_FOUND (-1)
 #define VOX_ERROR_INVALID_FORMAT (-2)
-#define VOX_ERROR_FILE_VERSION_TOO_OLD (-3)
+#define VOX_ERROR_FILE_VERSION_NOT_MATCH (-3)
 
 // VoxColor, 4 components, R8G8B8A8 (32bit)
 typedef struct {
@@ -123,6 +123,7 @@ typedef struct {
 
     // Arrays for mesh build
     ArrayVector3 vertices;
+	ArrayVector3 normals;
     ArrayUShort indices;
     ArrayColor colors;
 
@@ -150,7 +151,7 @@ void Vox_FreeArrays(VoxArray3D* voxarray);
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 //									Implementation
-///////////////////////////////////////////////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef VOX_LOADER_IMPLEMENTATION
@@ -164,7 +165,7 @@ void Vox_FreeArrays(VoxArray3D* voxarray);
 
 static void initArrayUShort(ArrayUShort* a, int initialSize)
 {
-	a->array = VOX_MALLOC(initialSize * sizeof(unsigned short));
+	a->array = (unsigned short *)VOX_MALLOC(initialSize * sizeof(unsigned short));
 	a->used = 0;
 	a->size = initialSize;
 }
@@ -174,7 +175,7 @@ static void insertArrayUShort(ArrayUShort* a, unsigned short element)
 	if (a->used == a->size)
 	{
 		a->size *= 2;
-		a->array = VOX_REALLOC(a->array, a->size * sizeof(unsigned short));
+		a->array = (unsigned short *)VOX_REALLOC(a->array, a->size * sizeof(unsigned short));
 	}
 	a->array[a->used++] = element;
 }
@@ -193,7 +194,7 @@ static void freeArrayUShort(ArrayUShort* a)
 
 static void initArrayVector3(ArrayVector3* a, int initialSize)
 {
-	a->array = VOX_MALLOC(initialSize * sizeof(VoxVector3));
+	a->array = (VoxVector3 *)VOX_MALLOC(initialSize * sizeof(VoxVector3));
 	a->used = 0;
 	a->size = initialSize;
 }
@@ -203,7 +204,7 @@ static void insertArrayVector3(ArrayVector3* a, VoxVector3 element)
 	if (a->used == a->size)
 	{
 		a->size *= 2;
-		a->array = VOX_REALLOC(a->array, a->size * sizeof(VoxVector3));
+		a->array = (VoxVector3 *)VOX_REALLOC(a->array, a->size * sizeof(VoxVector3));
 	}
 	a->array[a->used++] = element;
 }
@@ -221,7 +222,7 @@ static void freeArrayVector3(ArrayVector3* a)
 
 static void initArrayColor(ArrayColor* a, int initialSize)
 {
-	a->array = VOX_MALLOC(initialSize * sizeof(VoxColor));
+	a->array = (VoxColor *)VOX_MALLOC(initialSize * sizeof(VoxColor));
 	a->used = 0;
 	a->size = initialSize;
 }
@@ -231,7 +232,7 @@ static void insertArrayColor(ArrayColor* a, VoxColor element)
 	if (a->used == a->size)
 	{
 		a->size *= 2;
-		a->array = VOX_REALLOC(a->array, a->size * sizeof(VoxColor));
+		a->array = (VoxColor *)VOX_REALLOC(a->array, a->size * sizeof(VoxColor));
 	}
 	a->array[a->used++] = element;
 }
@@ -292,6 +293,16 @@ const VoxVector3 SolidVertex[] = {
 	{1, 1, 1}    //7
  };
 
+const VoxVector3 FacesPerSideNormal[] = {
+	{ -1, 0, 0 }, //-X
+	{1, 0, 0 },   //+X
+	{0,-1, 0},    //-Y
+	{0, 1, 0},    //+Y
+	{0, 0, -1},   //-Z
+	{0, 0,  1},  //+Z
+};
+
+
 // Allocated VoxArray3D size
 static void Vox_AllocArray(VoxArray3D* pvoxarray, int _sx, int _sy, int _sz)
 {
@@ -316,7 +327,7 @@ static void Vox_AllocArray(VoxArray3D* pvoxarray, int _sx, int _sy, int _sz)
 
 	// Alloc chunks array
 	int size = sizeof(CubeChunk3D) * chx * chy * chz;
-	pvoxarray->m_arrayChunks = VOX_MALLOC(size);
+	pvoxarray->m_arrayChunks = (CubeChunk3D *)VOX_MALLOC(size);
 	pvoxarray->arrayChunksSize = size;
 
 	// Init chunks array
@@ -334,16 +345,19 @@ static void Vox_AllocArray(VoxArray3D* pvoxarray, int _sx, int _sy, int _sz)
 // Set voxel ID from its position into VoxArray3D
 static void Vox_SetVoxel(VoxArray3D* pvoxarray, int x, int y, int z, unsigned char id)
 {
+	// A .vox file can place voxels outside the volume its own SIZE chunk declares,
+	// and the offsets below are derived directly from those coordinates. Same range
+	// checks Vox_GetVoxel() already performs.
+	if (x < 0 || y < 0 || z < 0) return;
+	if (x >= pvoxarray->sizeX || y >= pvoxarray->sizeY || z >= pvoxarray->sizeZ) return;
+
 	// Get chunk from array pos
 	int chX = x >> CHUNKSIZE_OPSHIFT; //x / CHUNKSIZE;
 	int chY = y >> CHUNKSIZE_OPSHIFT; //y / CHUNKSIZE;
 	int chZ = z >> CHUNKSIZE_OPSHIFT; //z / CHUNKSIZE;
 	int offset = (chX * pvoxarray->ChunkFlattenOffset) + (chZ * pvoxarray->chunksSizeY) + chY;
 
-	//if (offset > voxarray->arrayChunksSize)
-	//{
-	//	TraceLog(LOG_ERROR, "Out of array");
-	//}
+	if (offset < 0 || offset >= pvoxarray->chunksTotal) return;
 
 	CubeChunk3D* chunk = &pvoxarray->m_arrayChunks[offset];
 
@@ -355,7 +369,7 @@ static void Vox_SetVoxel(VoxArray3D* pvoxarray, int x, int y, int z, unsigned ch
 	if (chunk->m_array == 0)
 	{
 		int size = CHUNKSIZE * CHUNKSIZE * CHUNKSIZE;
-		chunk->m_array = VOX_MALLOC(size);
+		chunk->m_array = (unsigned char *)VOX_MALLOC(size);
 		chunk->arraySize = size;
 		memset(chunk->m_array, 0, size);
 
@@ -364,10 +378,7 @@ static void Vox_SetVoxel(VoxArray3D* pvoxarray, int x, int y, int z, unsigned ch
 
 	offset = (chX << CHUNK_FLATTENOFFSET_OPSHIFT) + (chZ << CHUNKSIZE_OPSHIFT) + chY;
 
-	//if (offset > chunk->arraySize)
-	//{
-	//	TraceLog(LOG_ERROR, "Out of array");
-	//}
+	if (offset < 0 || offset >= chunk->arraySize) return;
 
 	chunk->m_array[offset] = id;
 }
@@ -508,6 +519,11 @@ static void Vox_Build_Voxel(VoxArray3D* pvoxArray, int x, int y, int z, int matI
 		insertArrayVector3(&pvoxArray->vertices, vertComputed[v2]);
 		insertArrayVector3(&pvoxArray->vertices, vertComputed[v3]);
 
+		insertArrayVector3(&pvoxArray->normals, FacesPerSideNormal[i]);
+		insertArrayVector3(&pvoxArray->normals, FacesPerSideNormal[i]);
+		insertArrayVector3(&pvoxArray->normals, FacesPerSideNormal[i]);
+		insertArrayVector3(&pvoxArray->normals, FacesPerSideNormal[i]);
+
 		VoxColor col = pvoxArray->palette[matID];
 
 		insertArrayColor(&pvoxArray->colors, col);
@@ -538,31 +554,26 @@ int Vox_LoadFromMemory(unsigned char* pvoxData, unsigned int voxDataSize, VoxArr
 	// @raysan5: Reviewed (unsigned long) -> (unsigned int), possible issue with Ubuntu 18.04 64bit
 
 	// @raysan5: reviewed signature loading
-	unsigned char signature[4] = { 0 };
 
 	unsigned char* fileData = pvoxData;
 	unsigned char* fileDataPtr = fileData;
 	unsigned char* endfileDataPtr = fileData + voxDataSize;
 
-	signature[0] = fileDataPtr[0];
-	signature[1] = fileDataPtr[1];
-	signature[2] = fileDataPtr[2];
-	signature[3] = fileDataPtr[3];
-	fileDataPtr += 4;
-
-	if ((signature[0] != 'V') && (signature[0] != 'O') && (signature[0] != 'X') && (signature[0] != ' '))
+	if (strncmp((char*)fileDataPtr, "VOX ", 4) != 0)
 	{
 		return VOX_ERROR_INVALID_FORMAT; //"Not an MagicaVoxel File format"
 	}
+
+	fileDataPtr += 4;
 
 	// @raysan5: reviewed version loading
 	unsigned int version = 0;
 	version = ((unsigned int*)fileDataPtr)[0];
 	fileDataPtr += 4;
 
-	if (version < 150)
+	if (version != 150 && version != 200)
 	{
-		return VOX_ERROR_FILE_VERSION_TOO_OLD; //"MagicaVoxel version too old"
+		return VOX_ERROR_FILE_VERSION_NOT_MATCH; //"MagicaVoxel version doesn't match"
 	}
 
 
@@ -583,6 +594,9 @@ int Vox_LoadFromMemory(unsigned char* pvoxData, unsigned int voxDataSize, VoxArr
 
 	while (fileDataPtr < endfileDataPtr)
 	{
+		// A chunk header is 12 bytes: id + content size + children size
+		if ((endfileDataPtr - fileDataPtr) < 12) break;
+
 		char szChunkName[5];
 		memcpy(szChunkName, fileDataPtr, 4);
 		szChunkName[4] = 0;
@@ -596,6 +610,8 @@ int Vox_LoadFromMemory(unsigned char* pvoxData, unsigned int voxDataSize, VoxArr
 
 		if (strcmp(szChunkName, "SIZE") == 0)
 		{
+			if ((endfileDataPtr - fileDataPtr) < 12) break;
+
 			//(4 bytes x 3 : x, y, z ) 
 			sizeX = *((unsigned int*)fileDataPtr);
 			fileDataPtr += sizeof(unsigned int);
@@ -615,8 +631,13 @@ int Vox_LoadFromMemory(unsigned char* pvoxData, unsigned int voxDataSize, VoxArr
 
 			//(numVoxels : 4 bytes )
 			//(each voxel: 1 byte x 4 : x, y, z, colorIndex ) x numVoxels
+			if ((endfileDataPtr - fileDataPtr) < 4) break;
+
 			numVoxels = *((unsigned int*)fileDataPtr);
 			fileDataPtr += sizeof(unsigned int);
+
+			if (numVoxels > (unsigned int)(endfileDataPtr - fileDataPtr) / 4)
+				numVoxels = (unsigned int)(endfileDataPtr - fileDataPtr) / 4;
 
 			while (numVoxels > 0)
 			{
@@ -634,6 +655,8 @@ int Vox_LoadFromMemory(unsigned char* pvoxData, unsigned int voxDataSize, VoxArr
 		{
 			VoxColor col;
 
+			if ((endfileDataPtr - fileDataPtr) < (256 - 1) * 4) break;
+
 			//(each pixel: 1 byte x 4 : r, g, b, a ) x 256
 			for (int i = 0; i < 256 - 1; i++)
 			{
@@ -648,6 +671,7 @@ int Vox_LoadFromMemory(unsigned char* pvoxData, unsigned int voxDataSize, VoxArr
 		}
 		else
 		{
+			if (chunkSize > (unsigned int)(endfileDataPtr - fileDataPtr)) break;
 			fileDataPtr += chunkSize;
 		}
 	}
@@ -658,6 +682,7 @@ int Vox_LoadFromMemory(unsigned char* pvoxData, unsigned int voxDataSize, VoxArr
 
 	// Init Arrays
 	initArrayVector3(&pvoxarray->vertices, 3 * 1024);
+	initArrayVector3(&pvoxarray->normals, 3 * 1024);
 	initArrayUShort(&pvoxarray->indices, 3 * 1024);
 	initArrayColor(&pvoxarray->colors, 3 * 1024);
 
@@ -708,6 +733,7 @@ void Vox_FreeArrays(VoxArray3D* voxarray)
 
 	// Free arrays
 	freeArrayVector3(&voxarray->vertices);
+	freeArrayVector3(&voxarray->normals);
 	freeArrayUShort(&voxarray->indices);
 	freeArrayColor(&voxarray->colors);
 }

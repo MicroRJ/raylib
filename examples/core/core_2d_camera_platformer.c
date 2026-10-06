@@ -2,12 +2,16 @@
 *
 *   raylib [core] example - 2d camera platformer
 *
-*   This example has been created using raylib 2.5 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*   Example complexity rating: [★★★☆] 3/4
+*
+*   Example originally created with raylib 2.5, last time updated with raylib 3.0
 *
 *   Example contributed by arvyy (@arvyy) and reviewed by Ramon Santamaria (@raysan5)
 *
-*   Copyright (c) 2019 arvyy (@arvyy)
+*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software
+*
+*   Copyright (c) 2019-2025 arvyy (@arvyy)
 *
 ********************************************************************************************/
 
@@ -18,6 +22,9 @@
 #define PLAYER_JUMP_SPD 350.0f
 #define PLAYER_HOR_SPD 200.0f
 
+//----------------------------------------------------------------------------------
+// Types and Structures Definition
+//----------------------------------------------------------------------------------
 typedef struct Player {
     Vector2 position;
     float speed;
@@ -30,16 +37,19 @@ typedef struct EnvItem {
     Color color;
 } EnvItem;
 
-
+//----------------------------------------------------------------------------------
+// Module Functions Declaration
+//----------------------------------------------------------------------------------
 void UpdatePlayer(Player *player, EnvItem *envItems, int envItemsLength, float delta);
-
 void UpdateCameraCenter(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height);
 void UpdateCameraCenterInsideMap(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height);
 void UpdateCameraCenterSmoothFollow(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height);
 void UpdateCameraEvenOutOnLanding(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height);
 void UpdateCameraPlayerBoundsPush(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height);
 
-
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
@@ -47,7 +57,7 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - 2d camera");
+    InitWindow(screenWidth, screenHeight, "raylib [core] example - 2d camera platformer");
 
     Player player = { 0 };
     player.position = (Vector2){ 400, 280 };
@@ -65,7 +75,7 @@ int main(void)
 
     Camera2D camera = { 0 };
     camera.target = player.position;
-    camera.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
+    camera.offset = (Vector2){ GetRenderWidth()/2.0f, GetRenderHeight()/2.0f };
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
@@ -85,7 +95,7 @@ int main(void)
         "Follow player center",
         "Follow player center, but clamp to map edges",
         "Follow player center; smoothed",
-        "Follow player center horizontally; updateplayer center vertically after landing",
+        "Follow player center horizontally; update player center vertically after landing",
         "Player push camera on getting too close to screen edge"
     };
 
@@ -128,18 +138,21 @@ int main(void)
 
                 for (int i = 0; i < envItemsLength; i++) DrawRectangleRec(envItems[i].rect, envItems[i].color);
 
-                Rectangle playerRect = { player.position.x - 20, player.position.y - 40, 40, 40 };
+                Rectangle playerRect = { player.position.x - 20, player.position.y - 40, 40.0f, 40.0f };
                 DrawRectangleRec(playerRect, RED);
+
+                DrawCircleV(player.position, 5.0f, GOLD);
 
             EndMode2D();
 
             DrawText("Controls:", 20, 20, 10, BLACK);
             DrawText("- Right/Left to move", 40, 40, 10, DARKGRAY);
             DrawText("- Space to jump", 40, 60, 10, DARKGRAY);
-            DrawText("- Mouse Wheel to Zoom in-out, R to reset zoom", 40, 80, 10, DARKGRAY);
-            DrawText("- C to change camera mode", 40, 100, 10, DARKGRAY);
-            DrawText("Current camera mode:", 20, 120, 10, BLACK);
-            DrawText(cameraDescriptions[cameraOption], 40, 140, 10, DARKGRAY);
+            DrawText("- Mouse Wheel to Zoom in-out", 40, 80, 10, DARKGRAY);
+            DrawText("- R to reset position + zoom", 40, 100, 10, DARKGRAY);
+            DrawText("- C to change camera mode", 40, 120, 10, DARKGRAY);
+            DrawText("Current camera mode:", 20, 140, 10, BLACK);
+            DrawText(cameraDescriptions[cameraOption], 40, 160, 10, DARKGRAY);
 
         EndDrawing();
         //----------------------------------------------------------------------------------
@@ -163,7 +176,7 @@ void UpdatePlayer(Player *player, EnvItem *envItems, int envItemsLength, float d
         player->canJump = false;
     }
 
-    int hitObstacle = 0;
+    bool hitObstacle = false;
     for (int i = 0; i < envItemsLength; i++)
     {
         EnvItem *ei = envItems + i;
@@ -172,11 +185,12 @@ void UpdatePlayer(Player *player, EnvItem *envItems, int envItemsLength, float d
             ei->rect.x <= p->x &&
             ei->rect.x + ei->rect.width >= p->x &&
             ei->rect.y >= p->y &&
-            ei->rect.y < p->y + player->speed*delta)
+            ei->rect.y <= p->y + player->speed*delta)
         {
-            hitObstacle = 1;
+            hitObstacle = true;
             player->speed = 0.0f;
             p->y = ei->rect.y;
+            break;
         }
     }
 
@@ -213,10 +227,10 @@ void UpdateCameraCenterInsideMap(Camera2D *camera, Player *player, EnvItem *envI
     Vector2 max = GetWorldToScreen2D((Vector2){ maxX, maxY }, *camera);
     Vector2 min = GetWorldToScreen2D((Vector2){ minX, minY }, *camera);
 
-    if (max.x < width) camera->offset.x = width - (max.x - width/2);
-    if (max.y < height) camera->offset.y = height - (max.y - height/2);
-    if (min.x > 0) camera->offset.x = width/2 - min.x;
-    if (min.y > 0) camera->offset.y = height/2 - min.y;
+    if (max.x < width) camera->offset.x = width - (max.x - (float)width/2);
+    if (max.y < height) camera->offset.y = height - (max.y - (float)height/2);
+    if (min.x > 0) camera->offset.x = (float)width/2 - min.x;
+    if (min.y > 0) camera->offset.y = (float)height/2 - min.y;
 }
 
 void UpdateCameraCenterSmoothFollow(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height)
@@ -284,7 +298,7 @@ void UpdateCameraPlayerBoundsPush(Camera2D *camera, Player *player, EnvItem *env
 
     Vector2 bboxWorldMin = GetScreenToWorld2D((Vector2){ (1 - bbox.x)*0.5f*width, (1 - bbox.y)*0.5f*height }, *camera);
     Vector2 bboxWorldMax = GetScreenToWorld2D((Vector2){ (1 + bbox.x)*0.5f*width, (1 + bbox.y)*0.5f*height }, *camera);
-    camera->offset = (Vector2){ (1 - bbox.x)*0.5f * width, (1 - bbox.y)*0.5f*height };
+    camera->offset = (Vector2){ (1 - bbox.x)*0.5f*width, (1 - bbox.y)*0.5f*height };
 
     if (player->position.x < bboxWorldMin.x) camera->target.x = player->position.x;
     if (player->position.y < bboxWorldMin.y) camera->target.y = player->position.y;

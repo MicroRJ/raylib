@@ -89,13 +89,13 @@ OUTPUT_DIR="builds/osx"
 COMPILATION_FLAGS="-std=c99 -O2 -flto"
 FINAL_COMPILE_FLAGS="-s"
 WARNING_FLAGS="-Wall -Wextra -Wpedantic"
-LINK_FLAGS="-flto -framework OpenGL -framework OpenAL -framework IOKit -framework CoreVideo -framework Cocoa"
+LINK_FLAGS="-flto -framework OpenGL -framework OpenAL -framework IOKit -framework CoreVideo -framework Cocoa -framework QuartzCore"
 # Debug changes to flags
 if [ -n "$BUILD_DEBUG" ]; then
     OUTPUT_DIR="builds-debug/osx"
     COMPILATION_FLAGS="-std=c99 -O0 -g"
     FINAL_COMPILE_FLAGS=""
-    LINK_FLAGS="-framework OpenGL -framework OpenAL -framework IOKit -framework CoreVideo -framework Cocoa"
+    LINK_FLAGS="-framework OpenGL -framework OpenAL -framework IOKit -framework CoreVideo -framework Cocoa -framework QuartzCore"
 fi
 
 # Display what we're doing
@@ -130,7 +130,7 @@ if [ ! -d "$TEMP_DIR" ]; then
         $CC -c $RAYLIB_DEFINES $RAYLIB_INCLUDE_FLAGS $COMPILATION_FLAGS -x objective-c $RAYLIB_SRC/rglfw.c
         $CC -c $RAYLIB_DEFINES $RAYLIB_INCLUDE_FLAGS $COMPILATION_FLAGS $RAYLIB_C_FILES
     fi
-    [ -z "$QUIET" ] && echo "COMPILE-INFO: Raylib compiled into object files in: $TEMP_DIR/"
+    [ -z "$QUIET" ] && echo "COMPILE-INFO: raylib compiled into object files in: $TEMP_DIR/"
     cd $ROOT_DIR
 fi
 

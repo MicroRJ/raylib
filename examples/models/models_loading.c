@@ -1,27 +1,36 @@
 /*******************************************************************************************
 *
-*   raylib [models] example - Models loading
+*   raylib [models] example - loading
 *
-*   raylib supports multiple models file formats:
+*   Example complexity rating: [★☆☆☆] 1/4
+*
+*   NOTE: raylib supports multiple models file formats:
 *
 *     - OBJ  > Text file format. Must include vertex position-texcoords-normals information,
-*              if files references some .mtl materials file, it will be loaded (or try to).
-*     - GLTF > Text/binary file format. Includes lot of information and it could
-*              also reference external files, raylib will try loading mesh and materials data.
+*              if .obj references some .mtl materials file, it will be tried to be loaded
+*     - GLTF/GLB > Text/binary file formats. Includes lot of information and it could
+*              also reference external files, mesh and materials data will be tried to be loaded
 *     - IQM  > Binary file format. Includes mesh vertex data but also animation data,
-*              raylib can load .iqm animations.
+*              meshes and animation data can be loaded
 *     - VOX  > Binary file format. MagikaVoxel mesh format:
 *              https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
+*     - M3D  > Binary file format. Model 3D format:
+*              https://bztsrc.gitlab.io/model3d
 *
-*   This example has been created using raylib 4.0 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*   Example originally created with raylib 2.0, last time updated with raylib 4.2
 *
-*   Copyright (c) 2014-2021 Ramon Santamaria (@raysan5)
+*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software
+*
+*   Copyright (c) 2014-2025 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
 #include "raylib.h"
 
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
@@ -29,15 +38,15 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [models] example - models loading");
+    InitWindow(screenWidth, screenHeight, "raylib [models] example - loading");
 
     // Define the camera to look into our 3d world
     Camera camera = { 0 };
     camera.position = (Vector3){ 50.0f, 50.0f, 50.0f }; // Camera position
-    camera.target = (Vector3){ 0.0f, 10.0f, 0.0f };     // Camera looking at point
+    camera.target = (Vector3){ 0.0f, 12.0f, 0.0f };     // Camera looking at point
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
     camera.fovy = 45.0f;                                // Camera field-of-view Y
-    camera.projection = CAMERA_PERSPECTIVE;                   // Camera mode type
+    camera.projection = CAMERA_PERSPECTIVE;             // Camera mode type
 
     Model model = LoadModel("resources/models/obj/castle.obj");                 // Load model
     Texture2D texture = LoadTexture("resources/models/obj/castle_diffuse.png"); // Load model texture
@@ -50,8 +59,6 @@ int main(void)
     // NOTE: bounds are calculated from the original size of the model,
     // if model is scaled on drawing, bounds must be also scaled
 
-    SetCameraMode(camera, CAMERA_FREE);     // Set a free camera mode
-
     bool selected = false;          // Selected object flag
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -62,47 +69,50 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
-        UpdateCamera(&camera);
+        UpdateCamera(&camera, CAMERA_ORBITAL);
 
         // Load new models/textures on drag&drop
         if (IsFileDropped())
         {
-            int count = 0;
-            char **droppedFiles = GetDroppedFiles(&count);
+            FilePathList droppedFiles = LoadDroppedFiles();
 
-            if (count == 1) // Only support one file dropped
+            if (droppedFiles.count == 1) // Only support one file dropped
             {
-                if (IsFileExtension(droppedFiles[0], ".obj") ||
-                    IsFileExtension(droppedFiles[0], ".gltf") ||
-                    IsFileExtension(droppedFiles[0], ".glb") ||
-                    IsFileExtension(droppedFiles[0], ".vox") ||
-                    IsFileExtension(droppedFiles[0], ".iqm"))       // Model file formats supported
+                if (IsFileExtension(droppedFiles.paths[0], ".obj") ||
+                    IsFileExtension(droppedFiles.paths[0], ".gltf") ||
+                    IsFileExtension(droppedFiles.paths[0], ".glb") ||
+                    IsFileExtension(droppedFiles.paths[0], ".vox") ||
+                    IsFileExtension(droppedFiles.paths[0], ".iqm") ||
+                    IsFileExtension(droppedFiles.paths[0], ".m3d"))       // Model file formats supported
                 {
-                    UnloadModel(model);                     // Unload previous model
-                    model = LoadModel(droppedFiles[0]);     // Load new model
+                    UnloadModel(model);                         // Unload previous model
+                    model = LoadModel(droppedFiles.paths[0]);   // Load new model
                     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture; // Set current map diffuse texture
 
                     bounds = GetMeshBoundingBox(model.meshes[0]);
 
-                    // TODO: Move camera position from target enough distance to visualize model properly
+                    // Move camera position from target enough distance to visualize model properly
+                    camera.position.x = bounds.max.x + 10.0f;
+                    camera.position.y = bounds.max.y + 10.0f;
+                    camera.position.z = bounds.max.z + 10.0f;
                 }
-                else if (IsFileExtension(droppedFiles[0], ".png"))  // Texture file formats supported
+                else if (IsFileExtension(droppedFiles.paths[0], ".png"))  // Texture file formats supported
                 {
                     // Unload current model texture and load new one
                     UnloadTexture(texture);
-                    texture = LoadTexture(droppedFiles[0]);
+                    texture = LoadTexture(droppedFiles.paths[0]);
                     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
                 }
             }
 
-            ClearDroppedFiles();    // Clear internal buffers
+            UnloadDroppedFiles(droppedFiles);    // Unload filepaths from memory
         }
 
         // Select model on mouse click
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             // Check collision between ray and box
-            if (GetRayCollisionBox(GetMouseRay(GetMousePosition(), camera), bounds).hit) selected = !selected;
+            if (GetRayCollisionBox(GetScreenToWorldRay(GetMousePosition(), camera), bounds).hit) selected = !selected;
             else selected = false;
         }
         //----------------------------------------------------------------------------------

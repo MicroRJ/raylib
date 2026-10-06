@@ -2,19 +2,26 @@
 *
 *   raylib [textures] example - blend modes
 *
+*   Example complexity rating: [★☆☆☆] 1/4
+*
 *   NOTE: Images are loaded in CPU memory (RAM); textures are loaded in GPU memory (VRAM)
 *
-*   This example has been created using raylib 3.5 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*   Example originally created with raylib 3.5, last time updated with raylib 3.5
 *
 *   Example contributed by Karlo Licudine (@accidentalrebel) and reviewed by Ramon Santamaria (@raysan5)
 *
-*   Copyright (c) 2020 Karlo Licudine (@accidentalrebel)
+*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software
+*
+*   Copyright (c) 2020-2025 Karlo Licudine (@accidentalrebel)
 *
 ********************************************************************************************/
 
 #include "raylib.h"
 
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
@@ -37,6 +44,9 @@ int main(void)
 
     const int blendCountMax = 4;
     BlendMode blendMode = 0;
+
+    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+    //---------------------------------------------------------------------------------------
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -68,10 +78,10 @@ int main(void)
 
             switch (blendMode)
             {
-                case BLEND_ALPHA: DrawText("Current: BLEND_ALPHA", (screenWidth / 2) - 60, 370, 10, GRAY); break;
-                case BLEND_ADDITIVE: DrawText("Current: BLEND_ADDITIVE", (screenWidth / 2) - 60, 370, 10, GRAY); break;
-                case BLEND_MULTIPLIED: DrawText("Current: BLEND_MULTIPLIED", (screenWidth / 2) - 60, 370, 10, GRAY); break;
-                case BLEND_ADD_COLORS: DrawText("Current: BLEND_ADD_COLORS", (screenWidth / 2) - 60, 370, 10, GRAY); break;
+                case BLEND_ALPHA: DrawText("Current: BLEND_ALPHA", (screenWidth/2) - 60, 370, 10, GRAY); break;
+                case BLEND_ADDITIVE: DrawText("Current: BLEND_ADDITIVE", (screenWidth/2) - 60, 370, 10, GRAY); break;
+                case BLEND_MULTIPLIED: DrawText("Current: BLEND_MULTIPLIED", (screenWidth/2) - 60, 370, 10, GRAY); break;
+                case BLEND_ADD_COLORS: DrawText("Current: BLEND_ADD_COLORS", (screenWidth/2) - 60, 370, 10, GRAY); break;
                 default: break;
             }
 

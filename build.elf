@@ -5,7 +5,6 @@ raylib := {
 		{ name = "rshapes",   path = "src/rshapes.c" },
 		{ name = "rtext",     path = "src/rtext.c" },
 		{ name = "rtextures", path = "src/rtextures.c" },
-		{ name = "utils",     path = "src/utils.c" },
 		{ name = "raudio",    path = "src/raudio.c" },
 		{ name = "rglfw",     path = "src/rglfw.c" },
 	},
@@ -44,9 +43,6 @@ raylib := {
 	},
 
 	examples = {},
-	windows_excluded_examples = {
-		core_loading_thread = true,
-	},
 }
 
 for directory := raylib.example_directories[...] ? {
@@ -54,8 +50,7 @@ for directory := raylib.example_directories[...] ? {
 	elf.assert(paths != nil, f"could not list example directory '${directory}'")
 	for path := paths[...] ? {
 		name := elf.path.stem(path)
-		excluded := raylib.windows_excluded_examples:has(name)
-		if path:ends_with(".c") && excluded == 0 ? {
+		if path:ends_with(".c") ? {
 			raylib.examples:add({ name = name, source = path })
 		}
 	}

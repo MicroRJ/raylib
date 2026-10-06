@@ -1,11 +1,15 @@
 /*******************************************************************************************
 *
-*   raylib [text] example - Input Box
+*   raylib [text] example - input box
 *
-*   This example has been created using raylib 3.5 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*   Example complexity rating: [★★☆☆] 2/4
 *
-*   Copyright (c) 2017 Ramon Santamaria (@raysan5)
+*   Example originally created with raylib 1.7, last time updated with raylib 3.5
+*
+*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software
+*
+*   Copyright (c) 2017-2025 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -13,6 +17,9 @@
 
 #define MAX_INPUT_CHARS     9
 
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
@@ -30,7 +37,7 @@ int main(void)
 
     int framesCounter = 0;
 
-    SetTargetFPS(10);               // Set our game to run at 10 frames-per-second
+    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -56,7 +63,7 @@ int main(void)
                 if ((key >= 32) && (key <= 125) && (letterCount < MAX_INPUT_CHARS))
                 {
                     name[letterCount] = (char)key;
-                    name[letterCount+1] = '\0'; // Add null terminator at the end of the string.
+                    name[letterCount+1] = '\0'; // Add null terminator at the end of the string
                     letterCount++;
                 }
 
