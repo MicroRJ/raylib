@@ -24,8 +24,12 @@ development with C++ workload, including `clang-cl`. Then run this from the
 repository root:
 
 ```powershell
+manny --cache-vcvars
 manny build.elf build --workers 8
 ```
+
+The first command initializes Manny's cached Visual Studio environment and only
+needs to be run once.
 
 To build only the static library:
 
