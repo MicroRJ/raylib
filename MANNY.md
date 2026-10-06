@@ -9,13 +9,12 @@ The root [`build.elf`](build.elf) describes one concrete configuration:
 - a static release library;
 - OpenGL 3.3;
 - `clang-cl` with the MSVC linker and librarian;
-- 121 Windows-compatible examples.
+- all 226 examples in the current tree.
 
 The branch is based on upstream Raylib commit
-`c064eefe26ce1aaf54e665997ec746fa673e237c`. The pthread-based
-`core_loading_thread` example is excluded. Runtime resources are not staged, so
-examples that load `resources/...` must be launched with the appropriate working
-directory.
+`e18de0722427a5353c6044a0b7dc57ae07d8ef11`. Runtime resources are not staged,
+so examples that load `resources/...` must be launched with the appropriate
+working directory.
 
 ## Build it
 
@@ -40,8 +39,8 @@ manny build.elf library --workers 8
 The full build produces:
 
 - `build/raylib.lib`;
-- 121 executables under `build/examples`;
-- 129 object files under `build/obj`.
+- 226 executables under `build/examples`;
+- 233 object files under `build/obj`.
 
 ## What was verified
 
@@ -50,20 +49,20 @@ The case study was reproduced from a clean clone on Windows with Manny
 
 | Check | Result |
 | --- | --- |
-| Clean build | 251 tasks completed; 121 examples linked |
-| No-op build | All 251 tasks up to date; 101 ms on the test machine |
+| Clean build | 460 tasks completed; 226 examples linked |
+| No-op build | All 460 tasks up to date; 186 ms on the test machine |
 | One example source changed | That example's compile and link tasks rebuilt |
-| `raylib.h` changed | 126 dependent compilations, the archive, and 121 links rebuilt |
-| Compiler command changed | All 251 tasks rebuilt |
+| `raylib.h` changed | 231 dependent compilations, the archive, and 226 links rebuilt |
+| Compiler command changed | All 460 tasks rebuilt |
 
-Two clean verification builds took 17.0 and 23.7 seconds on the test machine.
-These timings describe one machine and are not presented as a benchmark against
+The clean verification build took 35.2 seconds on the test machine. These
+timings describe one machine and are not presented as a benchmark against
 Raylib's existing build systems.
 
 ## What this demonstrates
 
 Manny's unchanged core was sufficient to model, parallelize, and incrementally
-build this nontrivial Windows slice. The project-specific description is 153
+build this nontrivial Windows slice. The project-specific description is 148
 lines of elf and lowers directly into Manny tasks.
 
 Raylib's existing build definitions support substantially more: other operating
