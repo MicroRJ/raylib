@@ -50,13 +50,13 @@ The case study was reproduced from a clean clone on Windows with Manny
 | Check | Result |
 | --- | --- |
 | Clean build | 460 tasks completed; 226 examples linked |
-| No-op build | All 460 tasks up to date; 186 ms on the test machine |
+| No-op build | All 460 tasks up to date; 174-186 ms on the test machine |
 | One example source changed | That example's compile and link tasks rebuilt |
 | `raylib.h` changed | 231 dependent compilations, the archive, and 226 links rebuilt |
 | Compiler command changed | All 460 tasks rebuilt |
 
-The clean verification build took 35.2 seconds on the test machine. These
-timings describe one machine and are not presented as a benchmark against
+Two clean verification builds took 31.8 and 35.2 seconds on the test machine.
+These timings describe one machine and are not presented as a benchmark against
 Raylib's existing build systems.
 
 ## What this demonstrates
