@@ -135,6 +135,11 @@ for example := raylib.examples[...] ? {
 }
 
 entries := {}
+entries.clean = fun() {
+	elf.assert(elf.fs.remove_tree("build"), "could not remove build directory")
+	elf.assert(elf.fs.remove_tree(".manny"), "could not remove Manny state")
+}
+
 entries.library = fun() ret manny.build({
 	targets = { library },
 	options = { workers = 8 },

@@ -36,6 +36,12 @@ To build only the static library:
 manny build.elf library --workers 8
 ```
 
+To remove the build outputs and Manny's incremental state:
+
+```powershell
+manny build.elf clean
+```
+
 The full build produces:
 
 - `build/raylib.lib`;
@@ -54,6 +60,7 @@ The case study was reproduced from a clean clone on Windows with Manny
 | One example source changed | That example's compile and link tasks rebuilt |
 | `raylib.h` changed | 231 dependent compilations, the archive, and 226 links rebuilt |
 | Compiler command changed | All 460 tasks rebuilt |
+| Clean entry | Removed both `build` and `.manny`; the next build completed all 460 tasks |
 
 Two clean verification builds took 31.8 and 35.2 seconds on the test machine.
 These timings describe one machine and are not presented as a benchmark against
@@ -62,7 +69,7 @@ Raylib's existing build systems.
 ## What this demonstrates
 
 Manny's unchanged core was sufficient to model, parallelize, and incrementally
-build this nontrivial Windows slice. The project-specific description is 148
+build this nontrivial Windows slice. The project-specific description is 153
 lines of elf and lowers directly into Manny tasks.
 
 Raylib's existing build definitions support substantially more: other operating

@@ -1,5 +1,5 @@
 > **Manny case study:** This branch builds Raylib's Windows x64 static-library
-> slice and 226 examples with a 148-line [`build.elf`](build.elf).
+> slice and 226 examples with a 153-line [`build.elf`](build.elf).
 > See [MANNY.md](MANNY.md) for the exact scope and reproduction steps.
 
 <img align="left" style="width:260px" src="https://github.com/raysan5/raylib/blob/master/logo/raylib_logo_animation.gif" width="288px">
