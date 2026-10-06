@@ -111,7 +111,7 @@ for example := raylib.examples[...] ? {
 	}
 	compile := {
 		name = f"compile example: ${example.name}",
-		command_line = compile_command(example.source, object, example_includes, {}),
+		command_line = compile_command(example.source, object, example_includes, raylib.defines),
 		inputs = { example.source },
 		outputs = { object },
 		include_dirs = example_includes,
